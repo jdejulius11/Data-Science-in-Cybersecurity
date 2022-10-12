@@ -34,26 +34,25 @@ def PrefixToAS():
 	in_file = 'PrefixToAs.txt'
 	# in_file = "test.txt"
 
-	print("Parsing ", in_file)
+	print("Parsing", in_file)
 
 	with open(in_file) as in_file:
 		line = in_file.readline()
 		while line != '':
-			#print("Parsing line:", line[:-1])
-			# if line_chunks[0] in PrefixSet_Madison:
+			# print("Parsing line:", line[:-1])
+			# Each line is split into 3: IP, Prefix Length, AS
 			line_chunks = line.split()
 			# first = line_chunks[0].split('.')
 			# prefix = first[0] + '.' + first[1]
 
-			# Check
-			# if line_chunks[0] in PrefixSet_Madison:
+			# Check if read IP is in either of the PrefixSets.
 			if line_chunks[0] in PrefixSet_Madison or line_chunks[0] in PrefixSet_Other:
+				# Some AS's can be a multi-origin AS. Use the first origin.
 				AS = line_chunks[2].split('_')
 				for item in AS:
 					if item not in ASSet:
 						ASSet.add(item)
 			line = in_file.readline()
-			break
 
 	print(ASSet)
 	print(len(ASSet))
