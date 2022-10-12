@@ -32,22 +32,29 @@ def PrefixToAS():
 	ASSet = set()
 
 	in_file = 'PrefixToAs.txt'
-
 	# in_file = "test.txt"
+
+	print("Parsing ", in_file)
 
 	with open(in_file) as in_file:
 		line = in_file.readline()
 		while line != '':
-			l = line.split()
-			first = l[0].split('.')
-			prefix = first[0] + '.' + first[1]
-			if l[0] in PrefixSet_Madison or l[0] in PrefixSet_Other:
-				if l[0] in PrefixSet_Madison:
-					AS = l[2].split('_')
-					for item in AS:
-						if item not in ASSet:
-							ASSet.add(item)
+			#print("Parsing line:", line[:-1])
+			# if line_chunks[0] in PrefixSet_Madison:
+			line_chunks = line.split()
+			# first = line_chunks[0].split('.')
+			# prefix = first[0] + '.' + first[1]
+
+			# Check
+			# if line_chunks[0] in PrefixSet_Madison:
+			if line_chunks[0] in PrefixSet_Madison or line_chunks[0] in PrefixSet_Other:
+				AS = line_chunks[2].split('_')
+				for item in AS:
+					if item not in ASSet:
+						ASSet.add(item)
 			line = in_file.readline()
+			break
+
 	print(ASSet)
 	print(len(ASSet))
 	return ASSet
