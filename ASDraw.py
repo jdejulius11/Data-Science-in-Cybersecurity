@@ -15,8 +15,12 @@ def main():
 	with open(in_file) as in_file:
 		line = in_file.readline()
 		while line != "":
+			# Make sure the line is a valid set of data
+			if line.startswith("#"):
+				line = in_file.readline()
+				continue
 			line_chunks = line.split("|")
-			if line_chunks[0] in ASSet or line_chunks[1] in ASSet: #and (l[1] in ASSet or l[2] in ASSet):
+			if line_chunks[0] in ASSet or line_chunks[1] in ASSet: 
 				edge = (line_chunks[0], line_chunks[1])
 				if edge not in edges:
 					X.append(line_chunks[0])
@@ -24,13 +28,6 @@ def main():
 					edges.append(edge)
 					G.add_edge(line_chunks[0], line_chunks[1], color=colors[random.randint(0, 4)], weight=1)
 			line = in_file.readline()
-			"""
-			plt.xlabel('Values of X')
-			plt.ylabel('Values of Y')
-			plt.title('Simple Line Graph using Python')
-			plt.plot(X, Y)
-			plt.scatter(X, Y, label="stars", color="red", marker="*", s=30)
-			"""
 
 	plt.rcParams["figure.figsize"] = [7.50, 3.50]
 	plt.rcParams["figure.autolayout"] = True
