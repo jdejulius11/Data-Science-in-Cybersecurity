@@ -12,7 +12,7 @@
 # Imports #############################################
 #######################################################
 import requests
-import bs4
+from bs4 import BeautifulSoup
 
 # URLs ################################################
 AS_RELATIONSHIPS_SOURCE = "https://publicdata.caida.org/datasets/as-relationships/serial-2/?C=M;O=D"
@@ -20,8 +20,22 @@ IXP_DATA_SOURCE = "https://publicdata.caida.org/datasets/ixps/?C=M;O=D"
 PFX2AS_BASE = "http://data.caida.org/datasets/routing/routeviews-prefix2as/"
 PFX2AS_LOG = PFX2AS_BASE + "pfx2as-creation.log"
 
+# Other Declarations
+SOUP_PARSER = "html.parser" # Default parser included with Python.
+
+#######################################################
+# Functions ###########################################
+#######################################################
 def importASRelationships():
-	#
+	"""Updates the AS Relationships folder with the latest source of data."""
+	res = requests.get(AS_RELATIONSHIPS_SOURCE)
+	if res.status_code != 200:
+		print("There was an error updating the AS relationships!")
+		print(res.text)
+		exit(-1)
+
+	# Text is the HTML document.
+
 	pass
 
 def importIXPLocations():
@@ -32,3 +46,4 @@ def importPFX2AS():
 	#
 	pass
 
+importASRelationships()
