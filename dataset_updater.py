@@ -50,6 +50,11 @@ def importASRelationships():
 	print(f"Latest AS Relationship dataset: {latest}")
 
 	download = requests.get(f"{AS_RELATIONSHIPS_SOURCE}/{latest}")
+	if download.statusCode != 20:
+		print("There was an error trying to download the file.")
+		print(res.text)
+		exit(-1)
+
 	save_location = f"./AS Relationships/{latest}"
 	save_location = save_location[0:-4]
 
