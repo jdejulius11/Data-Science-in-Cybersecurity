@@ -50,7 +50,7 @@ def importASRelationships():
 	print(f"Latest AS Relationship dataset: {latest}")
 
 	download = requests.get(f"{AS_RELATIONSHIPS_SOURCE}/{latest}")
-	if download.statusCode != 200:
+	if download.status_code != 200:
 		print("There was an error trying to download the file.")
 		print(res.text)
 		exit(-1)
