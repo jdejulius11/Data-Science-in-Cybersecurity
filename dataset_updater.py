@@ -15,6 +15,7 @@ import requests
 import re
 import bz2
 import os
+import sys
 from bs4 import BeautifulSoup
 
 # URLs ################################################
@@ -65,11 +66,29 @@ def importASRelationships():
 
 
 def importIXPLocations():
-	#
+	"""Updates all the IXP data."""
+	# https://www.caida.org/catalog/datasets/ixps/
+
 	pass
 
 def importPFX2AS():
 	#
 	pass
 
-importASRelationships()
+if __name__ == "__main__":
+	if len(sys.argv) < 2:
+		print("Choose which dataset to update: as, ixp, pfx")
+		exit(0)
+
+	if sys.argv[1] == "as":
+		print("Running importASRelationships")
+		importASRelationships()
+	elif sys.argv[1] == "ixp":
+		print("Running importIXPLocations")
+		importIXPLocations()
+	elif sys.argv[1] == "pfx":
+		print("Running importPFX2AS")
+		importPFX2AS()
+	else:
+		print("Invalid choice")
+		exit(0)
