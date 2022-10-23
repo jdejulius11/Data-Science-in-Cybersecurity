@@ -16,11 +16,12 @@ import re
 import bz2
 import os
 import sys
+import json
 from bs4 import BeautifulSoup
 
 # URLs ################################################
 AS_RELATIONSHIPS_SOURCE = "https://publicdata.caida.org/datasets/as-relationships/serial-2/"
-IXP_DATA_SOURCE = "https://publicdata.caida.org/datasets/ixps/"
+IXP_DATA_SOURCE = "https://publicdata.caida.org/datasets/ixps/ixps_v2/"  # https://publicdata.caida.org/datasets/ixps/"
 PFX2AS_BASE = "http://data.caida.org/datasets/routing/routeviews-prefix2as/"
 PFX2AS_LOG = PFX2AS_BASE + "pfx2as-creation.log"
 
@@ -30,6 +31,17 @@ SOUP_PARSER = "html.parser"  # Default parser included with Python.
 #######################################################
 # Functions ###########################################
 #######################################################
+def jsonlToJson(raw_data):
+	entries = []
+	decoder = json.JSONDecoder()
+	for line in raw_data.splitlines():
+		if len(line) > 0 and not line.startswith(b"#"):
+			entries.append(decoder.decode(line))
+
+	return json.dumps(entries)
+
+
+
 def importASRelationships():
 	"""Updates the AS Relationships folder with the latest source of data."""
 	res = requests.get(AS_RELATIONSHIPS_SOURCE)
@@ -68,12 +80,47 @@ def importASRelationships():
 def importIXPLocations():
 	"""Updates all the IXP data."""
 	# https://www.caida.org/catalog/datasets/ixps/
+	# https://publicdata.caida.org/datasets/ixps/ixps_v2/
+	res = requests.get(IXP_DATA_SOURCE)
+	if res.status_code != 200:
+		print("There was an error contacting the database of AS relationships!")
+		print(res.text)
+		exit(-1)
 
-	pass
+	soup = BeautifulSoup(res.text, SOUP_PARSER)
+
+	sets = {
+		"facilities": [],
+		"ix-asns": [],
+		"ix-facilities": [],
+		"ixs": [],
+		"locations": [],
+		"organizations": [],
+	}
+
+	for link in soup.find_all("a"):
+		href = link.get("href")
+		m = re.match(r"([-\w]+)_(\d+)\.jsonl", href)
+		if m:
+			if m.group(1) in sets:
+				sets[m.group(1)].append(href)
+			else:
+				print("An unknown dataset type is present?")
+				print(m.group(1))
+				exit(-1)
+
+	for typ, data in sets.items():
+		data.sort(reverse=True)
+		print(f"Most recent dataset of '{typ}' is {data[0]}.")
+
+
+
+
 
 def importPFX2AS():
 	#
 	pass
+
 
 if __name__ == "__main__":
 	if len(sys.argv) < 2:
