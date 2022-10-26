@@ -39,7 +39,6 @@ def main():
 
 	time2 = time.time()
 	print(f"Time to parse {file_path}: {time2-time1:.4f}s")
-	exit(1)
 
 	plt.rcParams["figure.figsize"] = [7.50, 3.50]
 	# Leads to the "This figure includes Axes that are not compatible with tight_layout, so results might be incorrect."
