@@ -17,6 +17,8 @@ import bz2
 import os
 import sys
 import json
+import datetime
+import gzip
 from bs4 import BeautifulSoup
 
 # URLs ################################################
@@ -123,7 +125,7 @@ def importIXPLocations():
 		download = requests.get(IXP_DATA_SOURCE + path)
 		if download.status_code != 200:
 			print("\tDownload failed!")
-			print(res.text)
+			print(download.text)
 			exit(-1)
 
 		print("\tDownload complete. Converting to JSON...")
@@ -136,8 +138,35 @@ def importIXPLocations():
 		print(f"\tFinished saving! Saved to: \"{os.path.abspath(save_location)}\"")
 
 def importPFX2AS():
-	#
-	pass
+	"""Updates the PFX2AS datasets."""
+	res = requests.get(PFX2AS_LOG)
+	if res.status_code != 200:
+		print("There was an error fetching the creation log.")
+		print(res.text)
+		exit(-1)
+
+	entries = re.findall(r"(\d+)\s+(\d+)\s+([\w./\-]+)\s*", res.text)
+	entries.sort(reverse=True)
+
+	# Entry ID, Timestamp, Path
+	latest = entries[0]
+	timestamp = datetime.date.fromtimestamp(int(latest[1])).strftime('%A, %B %d, %Y at %X')
+	print(f"Latest entry (#{latest[0]}) is from {timestamp} ({latest[2]})")
+	print("Downloading...")
+	download = requests.get(f"{PFX2AS_BASE}/{latest[2]}")
+	if download.status_code != 200:
+		print("There was an error trying to download the file.")
+		print(res.text)
+		exit(-1)
+
+	print("Download complete. Decompressing & saving...")
+	filename = os.path.splitext(os.path.basename(latest[2]))[0]
+	save_location = "./Prefix-to-AS/" + filename
+
+	with open(save_location, "wb") as f:
+		f.write(gzip.decompress(download.content))
+
+	print(f"Finished saving! Saved to: \"{os.path.abspath(save_location)}\"")
 
 
 if __name__ == "__main__":
