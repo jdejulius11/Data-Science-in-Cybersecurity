@@ -35,7 +35,7 @@ def jsonlToJson(raw_data):
 	entries = []
 	decoder = json.JSONDecoder()
 	for line in raw_data.splitlines():
-		if len(line) > 0 and not line.startswith(b"#"):
+		if len(line) > 0 and not line.startswith("#"):
 			entries.append(decoder.decode(line))
 
 	return json.dumps(entries)
@@ -60,7 +60,7 @@ def importASRelationships():
 
 	found.sort(reverse=True)
 	latest = found[0]
-	print(f"Latest AS Relationship dataset: {latest}")
+	print(f"Latest AS Relationship dataset is '{latest}'. Downloading...")
 
 	download = requests.get(f"{AS_RELATIONSHIPS_SOURCE}/{latest}")
 	if download.status_code != 200:
@@ -68,13 +68,15 @@ def importASRelationships():
 		print(res.text)
 		exit(-1)
 
+	print("Download complete. Decompressing & saving...")
+
 	save_location = f"./AS Relationships/{latest}"
 	save_location = save_location[0:-4]
 
 	with open(save_location, "wb") as f:
 		f.write(bz2.decompress(download.content))
 
-	print(f"Finished downloading! Saved to: {os.path.abspath(save_location)}")
+	print(f"Finished saving! Saved to: \"{os.path.abspath(save_location)}\"")
 
 
 def importIXPLocations():
@@ -111,11 +113,27 @@ def importIXPLocations():
 
 	for typ, data in sets.items():
 		data.sort(reverse=True)
-		print(f"Most recent dataset of '{typ}' is {data[0]}.")
+		print(f"Most recent dataset of '{typ}' is '{data[0]}'")
 
+	base_save_location = "./IXP-Locations/"
 
+	for name in sets:
+		path = sets[name][0]
+		print(f"Downloading '{path}'")
+		download = requests.get(IXP_DATA_SOURCE + path)
+		if download.status_code != 200:
+			print("\tDownload failed!")
+			print(res.text)
+			exit(-1)
 
-
+		print("\tDownload complete. Converting to JSON...")
+		json_str = jsonlToJson(download.text)
+		print("\tSaving...")
+		#print("\t\t", path, os.path.splitext(path), os.path.splitext(path)[0] + ".json")
+		save_location = base_save_location + os.path.splitext(path)[0] + ".json"
+		with open(save_location, "w") as save_file:
+			save_file.write(json_str)
+		print(f"\tFinished saving! Saved to: \"{os.path.abspath(save_location)}\"")
 
 def importPFX2AS():
 	#

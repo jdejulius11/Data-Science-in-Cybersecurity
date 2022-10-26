@@ -1,3 +1,4 @@
+import time
 
 def PrefixToAS():
 	PrefixSet_Madison = [
@@ -32,11 +33,13 @@ def PrefixToAS():
 		]
 	ASSet = set()
 
-	in_file = 'PrefixToAs.txt'
+	file_path = 'PrefixToAs.txt'
 
-	print("Parsing", in_file)
+	print("Parsing", file_path)
 
-	with open(in_file) as in_file:
+	start_time = time.time()
+
+	with open(file_path) as in_file:
 		line = in_file.readline()
 		while line != '':
 			# print("Parsing line:", line[:-1])
@@ -52,7 +55,12 @@ def PrefixToAS():
 						ASSet.add(item)
 			line = in_file.readline()
 
-	print(ASSet)
-	print(len(ASSet))
+	end_time = time.time()
+	print(f"Parsing {file_path} took {end_time-start_time:.4f}s")
+	# print(ASSet)
+	print("Total sets:", len(ASSet))
 	return ASSet
 
+
+if __name__ == "__main__":
+	PrefixToAS()
