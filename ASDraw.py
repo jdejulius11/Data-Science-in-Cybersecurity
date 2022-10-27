@@ -9,6 +9,7 @@ def main():
 	# num of ASes
 	# num of RPKI validated
 	# this is some good data to have
+	# TODO: Figure out how AS numbers are assigned.
 
 	colors = ['r', 'g', 'b', 'y', 'm']
 	X = []

@@ -46,6 +46,7 @@ def jsonlToJson(raw_data):
 
 def importASRelationships():
 	"""Updates the AS Relationships folder with the latest source of data."""
+	print("Running importASRelationships")
 	res = requests.get(AS_RELATIONSHIPS_SOURCE)
 	if res.status_code != 200:
 		print("There was an error contacting the database of AS relationships!")
@@ -83,6 +84,7 @@ def importASRelationships():
 
 def importIXPLocations():
 	"""Updates all the IXP data."""
+	print("Running importIXPLocations")
 	# https://www.caida.org/catalog/datasets/ixps/
 	# https://publicdata.caida.org/datasets/ixps/ixps_v2/
 	res = requests.get(IXP_DATA_SOURCE)
@@ -139,6 +141,7 @@ def importIXPLocations():
 
 def importPFX2AS():
 	"""Updates the PFX2AS datasets."""
+	print("Running importPFX2AS")
 	res = requests.get(PFX2AS_LOG)
 	if res.status_code != 200:
 		print("There was an error fetching the creation log.")
@@ -171,17 +174,19 @@ def importPFX2AS():
 
 if __name__ == "__main__":
 	if len(sys.argv) < 2:
-		print("Choose which dataset to update: as, ixp, pfx")
+		print("Choose which dataset to update: as, ixp, pfx/pfx2as, or all")
 		exit(0)
 
 	if sys.argv[1] == "as":
-		print("Running importASRelationships")
 		importASRelationships()
 	elif sys.argv[1] == "ixp":
-		print("Running importIXPLocations")
 		importIXPLocations()
-	elif sys.argv[1] == "pfx":
-		print("Running importPFX2AS")
+	elif sys.argv[1] == "pfx" or sys.argv[1] == "pfx2as":
+		importPFX2AS()
+	elif sys.argv[1] == "all":
+		print("Running all importers")
+		importASRelationships()
+		importIXPLocations()
 		importPFX2AS()
 	else:
 		print("Invalid choice")
