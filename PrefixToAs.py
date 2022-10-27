@@ -1,5 +1,21 @@
 import time
 
+# Madison: https://kb.wisc.edu/ns/page.php?id=3988
+"""
+72.33.0.0/16
+144.92.0.0/16
+128.104.0.0/16
+128.105.0.0/16
+146.151.0.0/17 - Resnet
+146.151.128.0/17
+198.133.224.0/24
+198.133.225.0/24
+198.51.254.0/24
+"""
+def pairDatasets():
+	
+	pass
+
 def PrefixToAS():
 	PrefixSet_Madison = [
 		'72.33.0.0',

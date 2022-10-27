@@ -21,6 +21,7 @@ def main():
 	time1 = time.time()
 	file_path = "ASlinks.txt"
 	# TODO: Using the test sets with len(set_AS) == 72348 takes FAR too long (over 15 minutes and counting)
+	# Could pandas help with this?
 	with open(file_path) as in_file:
 		line = in_file.readline()
 		while line != "":
