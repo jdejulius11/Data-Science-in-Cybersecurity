@@ -19,6 +19,7 @@ import sys
 import json
 import datetime
 import gzip
+import time
 from bs4 import BeautifulSoup
 
 # URLs ################################################
@@ -64,14 +65,16 @@ def importASRelationships():
 	found.sort(reverse=True)
 	latest = found[0]
 	print(f"Latest AS Relationship dataset is '{latest}'. Downloading...")
+	download_start_time = time.time()
 
 	download = requests.get(f"{AS_RELATIONSHIPS_SOURCE}/{latest}")
 	if download.status_code != 200:
 		print("There was an error trying to download the file.")
 		print(res.text)
 		exit(-1)
+	download_end_time = time.time()
 
-	print("Download complete. Decompressing & saving...")
+	print(f"Download complete ({download_end_time-download_start_time:.0f} seconds). Decompressing & saving...")
 
 	save_location = f"./AS Relationships/{latest}"
 	save_location = save_location[0:-4]
@@ -124,20 +127,23 @@ def importIXPLocations():
 	for name in sets:
 		path = sets[name][0]
 		print(f"Downloading '{path}'")
+
+		download_start_time = time.time()
 		download = requests.get(IXP_DATA_SOURCE + path)
 		if download.status_code != 200:
 			print("\tDownload failed!")
 			print(download.text)
 			exit(-1)
+		download_end_time = time.time()
 
-		print("\tDownload complete. Converting to JSON...")
+		print(f"\tDownload complete ({download_end_time-download_start_time:.0f} seconds). Converting to JSON...")
 		json_str = jsonlToJson(download.text)
 		print("\tSaving...")
-		#print("\t\t", path, os.path.splitext(path), os.path.splitext(path)[0] + ".json")
 		save_location = base_save_location + os.path.splitext(path)[0] + ".json"
 		with open(save_location, "w") as save_file:
 			save_file.write(json_str)
 		print(f"\tFinished saving! Saved to: \"{os.path.abspath(save_location)}\"")
+
 
 def importPFX2AS():
 	"""Updates the PFX2AS datasets."""
@@ -156,13 +162,15 @@ def importPFX2AS():
 	timestamp = datetime.date.fromtimestamp(int(latest[1])).strftime('%A, %B %d, %Y at %X')
 	print(f"Latest entry (#{latest[0]}) is from {timestamp} ({latest[2]})")
 	print("Downloading...")
+	download_start_time = time.time()
 	download = requests.get(f"{PFX2AS_BASE}/{latest[2]}")
 	if download.status_code != 200:
 		print("There was an error trying to download the file.")
-		print(res.text)
+		print(download.text)
 		exit(-1)
+	download_end_time = time.time()
 
-	print("Download complete. Decompressing & saving...")
+	print(f"Download complete ({download_end_time-download_start_time:.0f} seconds). Decompressing & saving...")
 	filename = os.path.splitext(os.path.basename(latest[2]))[0]
 	save_location = "./Prefix-to-AS/" + filename
 
@@ -185,9 +193,14 @@ if __name__ == "__main__":
 		importPFX2AS()
 	elif sys.argv[1] == "all":
 		print("Running all importers")
+		print("-" * 50)
 		importASRelationships()
+		print("-" * 50)
 		importIXPLocations()
+		print("-" * 50)
 		importPFX2AS()
+		print("-" * 50)
+		print("Finished running all importers")
 	else:
 		print("Invalid choice")
 		exit(0)
