@@ -21,9 +21,11 @@ import datetime
 import gzip
 import time
 from bs4 import BeautifulSoup
+#import pandas as pd
 
 # URLs ################################################
 AS_RELATIONSHIPS_SOURCE = "https://publicdata.caida.org/datasets/as-relationships/serial-2/"
+AS_RELATIONSHIPS_GEO = "https://publicdata.caida.org/datasets/as-relationships-geo/"
 IXP_DATA_SOURCE = "https://publicdata.caida.org/datasets/ixps/ixps_v2/"  # https://publicdata.caida.org/datasets/ixps/"
 PFX2AS_BASE = "http://data.caida.org/datasets/routing/routeviews-prefix2as/"
 PFX2AS_LOG = PFX2AS_BASE + "pfx2as-creation.log"
@@ -81,6 +83,45 @@ def importASRelationships():
 
 	with open(save_location, "wb") as f:
 		f.write(bz2.decompress(download.content))
+
+	print(f"Finished saving! Saved to: \"{os.path.abspath(save_location)}\"")
+
+def importASRelationshipsGeo():
+	"""Updates the AS Relationships Geo folder with the latest source of data."""
+	print("Running importASRelationshipsGeo")
+	res = requests.get(AS_RELATIONSHIPS_GEO)
+	if res.status_code != 200:
+		print("There was an error contacting the database of AS relationships (Geo)!")
+		print(res.text)
+		exit(-1)
+
+	soup = BeautifulSoup(res.text, SOUP_PARSER)
+
+	found = []
+	for link in soup.find_all("a"):
+		href = link.get("href")
+		if re.search("\d+\.as-rel-geo\.txt\.gz", href):
+			found.append(href)
+
+	found.sort(reverse=True)
+	latest = found[0]
+	print(f"Latest AS Relationship (Geo) dataset is '{latest}'. Downloading...")
+	download_start_time = time.time()
+
+	download = requests.get(f"{AS_RELATIONSHIPS_GEO}/{latest}")
+	if download.status_code != 200:
+		print("There was an error trying to download the file.")
+		print(res.text)
+		exit(-1)
+	download_end_time = time.time()
+
+	print(f"Download complete ({download_end_time - download_start_time:.0f} seconds). Decompressing & saving...")
+
+	save_location = f"./AS Relationships/{latest}"
+	save_location = save_location[0:-4]
+
+	with open(save_location, "wb") as f:
+		f.write(gzip.decompress(download.content))
 
 	print(f"Finished saving! Saved to: \"{os.path.abspath(save_location)}\"")
 
@@ -182,11 +223,13 @@ def importPFX2AS():
 
 if __name__ == "__main__":
 	if len(sys.argv) < 2:
-		print("Choose which dataset to update: as, ixp, pfx/pfx2as, or all")
+		print("Choose which dataset to update: as, as-geo, ixp, pfx/pfx2as, or all")
 		exit(0)
 
 	if sys.argv[1] == "as":
 		importASRelationships()
+	elif sys.argv[1] == "as-geo":
+		importASRelationshipsGeo()
 	elif sys.argv[1] == "ixp":
 		importIXPLocations()
 	elif sys.argv[1] == "pfx" or sys.argv[1] == "pfx2as":
@@ -195,6 +238,8 @@ if __name__ == "__main__":
 		print("Running all importers")
 		print("-" * 50)
 		importASRelationships()
+		print("-" * 50)
+		importASRelationshipsGeo()
 		print("-" * 50)
 		importIXPLocations()
 		print("-" * 50)

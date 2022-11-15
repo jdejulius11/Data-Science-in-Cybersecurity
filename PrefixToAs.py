@@ -63,12 +63,13 @@ def PrefixToAS():
 			line_chunks = line.split()
 
 			# Check if read IP is in either of the PrefixSets.
-			if line_chunks[0] in PrefixSet_Madison or line_chunks[0] in PrefixSet_Other:
+			#if line_chunks[0] in PrefixSet_Madison or line_chunks[0] in PrefixSet_Other:
 				# Some AS's can be a multi-origin AS. Use the first origin.
-				AS = line_chunks[2].split('_')
-				for item in AS:
-					if item not in ASSet:
-						ASSet.add(item)
+			AS = line_chunks[2].split(',')
+			print(line_chunks)
+			for item in AS:
+				if item not in ASSet:
+					ASSet.add(item)
 			line = in_file.readline()
 
 	end_time = time.time()
