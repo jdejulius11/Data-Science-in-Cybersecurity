@@ -33,10 +33,15 @@ PFX2AS_LOG = PFX2AS_BASE + "pfx2as-creation.log"
 # Other Declarations
 SOUP_PARSER = "html.parser"  # Default parser included with Python.
 
+"""
+requests.exceptions.ConnectTimeout: HTTPSConnectionPool(host='publicdata.caida.org', port=443): Max retries exceeded with url: /datasets/as-relationships/serial-2/ (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x000001B3346A9480>, 'Connection to publicdata.caida.org timed out. (co
+nnect timeout=None)'))
+"""
 #######################################################
 # Functions ###########################################
 #######################################################
 def jsonlToJson(raw_data):
+	"""Responsible for converting .jsonl files into .json files we can work with."""
 	entries = []
 	decoder = json.JSONDecoder()
 	for line in raw_data.splitlines():
@@ -58,12 +63,14 @@ def importASRelationships():
 
 	soup = BeautifulSoup(res.text, SOUP_PARSER)
 
+	# Scraping for valid download links.
 	found = []
 	for link in soup.find_all("a"):
 		href = link.get("href")
 		if re.search("\d+\.as-rel2\.txt\.bz2", href):
 			found.append(href)
 
+	# Sorting for the latest set.
 	found.sort(reverse=True)
 	latest = found[0]
 	print(f"Latest AS Relationship dataset is '{latest}'. Downloading...")
@@ -97,12 +104,14 @@ def importASRelationshipsGeo():
 
 	soup = BeautifulSoup(res.text, SOUP_PARSER)
 
+	# Scraping for valid download links.
 	found = []
 	for link in soup.find_all("a"):
 		href = link.get("href")
 		if re.search("\d+\.as-rel-geo\.txt\.gz", href):
 			found.append(href)
 
+	# Sorting for the latest data set.
 	found.sort(reverse=True)
 	latest = found[0]
 	print(f"Latest AS Relationship (Geo) dataset is '{latest}'. Downloading...")
@@ -148,6 +157,7 @@ def importIXPLocations():
 		"organizations": [],
 	}
 
+	# Scraping for valid dataset download links.
 	for link in soup.find_all("a"):
 		href = link.get("href")
 		m = re.match(r"([-\w]+)_(\d+)\.jsonl", href)
@@ -159,6 +169,7 @@ def importIXPLocations():
 				print(m.group(1))
 				exit(-1)
 
+	# Sort each dataset type for the latest entry.
 	for typ, data in sets.items():
 		data.sort(reverse=True)
 		print(f"Most recent dataset of '{typ}' is '{data[0]}'")
@@ -195,6 +206,7 @@ def importPFX2AS():
 		print(res.text)
 		exit(-1)
 
+	# Match the Entry ID, Timestamp, and Path for a list of entries from the log.
 	entries = re.findall(r"(\d+)\s+(\d+)\s+([\w./\-]+)\s*", res.text)
 	entries.sort(reverse=True)
 

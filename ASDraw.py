@@ -1,3 +1,4 @@
+import os
 import csv
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -11,7 +12,6 @@ def main():
 	# num of ASes
 	# num of RPKI validated
 	# this is some good data to have
-	# TODO: Figure out how AS numbers are assigned.
 
 	# colors = ['r', 'g', 'b', 'y', 'm']
 	# X = []
@@ -22,20 +22,22 @@ def main():
 
 	location = input("Please enter chicago or illinois: \n")
 	location += "_data.csv"
+	if not os.path.exists(location):
+		print("That file does not exist.")
+		exit(-1)
 
 	set_AS = ASSet(location)
 	print(len(set_AS))
 
-
 	time1 = time.time()
 	file_path = "ASlinks.txt"
 	# TODO: Using the test sets with len(set_AS) == 72348 takes FAR too long (over 15 minutes and counting)
-	# Could pandas help with this?
 	with open(file_path) as in_file:
-		f = open('./edges.csv','w')
+		# Open CSV file for writing.
+		f = open('./edges.csv', 'w')
 		writer = csv.writer(f)
 
-
+		# Reading line by line
 		line = in_file.readline()
 		while line != "":
 			# Make sure the line is uncommented
