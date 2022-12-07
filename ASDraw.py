@@ -1,3 +1,4 @@
+# The basis of this file came from Dr. Wu, and was later edited by us.
 import os
 import csv
 import matplotlib.pyplot as plt
@@ -13,6 +14,7 @@ def main():
 	# num of RPKI validated
 	# this is some good data to have
 
+	# Dr. Wu
 	# colors = ['r', 'g', 'b', 'y', 'm']
 	# X = []
 	# Y = []
@@ -20,6 +22,7 @@ def main():
 	# graph = nx.Graph()
 	# set_AS = PrefixToAS()
 
+	# Us.
 	location = input("Please enter chicago or illinois: \n")
 	location += "_data.csv"
 	if not os.path.exists(location):
@@ -38,24 +41,26 @@ def main():
 		writer = csv.writer(f)
 
 		# Reading line by line
-		line = in_file.readline()
+		line = in_file.readline() # Dr. Wu
 		while line != "":
 			# Make sure the line is uncommented
 			if line.startswith("#"):
 				line = in_file.readline()
 				continue
+
 			line_chunks = line.split("|")
 			if (int(line_chunks[0]) in set_AS) and (int(line_chunks[1]) in set_AS):
 				edge = (line_chunks[0], line_chunks[1])
 				if edge not in edges:
-					# X.append(line_chunks[0])
-					# Y.append(line_chunks[1])
+					# X.append(line_chunks[0]) # Dr. Wu
+					# Y.append(line_chunks[1]) # Dr. Wu
 					edges.append(edge)
-					# graph.add_edge(line_chunks[0], line_chunks[1], color=colors[random.randint(0, 4)], weight=1)
+					# graph.add_edge(line_chunks[0], line_chunks[1], color=colors[random.randint(0, 4)], weight=1) # Dr. Wu
 					writer.writerow(edge)
-			line = in_file.readline()
+			line = in_file.readline() # Dr. Wu
 
 		f.close()
+
 	time2 = time.time()
 	print(f"Time to parse {file_path}: {time2-time1:.4f}s")
 
