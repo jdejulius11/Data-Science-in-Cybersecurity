@@ -1,8 +1,8 @@
 import pandas as pd
 import argparse
 
-def ASSet(location):
-	#ASSet connected to IXPs
+def ASSet(location: str):
+	# ASSet connected to IXPs
 	data = pd.read_csv(location, dtype={'asn': int, 'ix_id': int, 'fac_id': int, 'name': str, 'state': str, 'city': str})
 	return data.asn.unique()
 
@@ -15,11 +15,14 @@ parser = argparse.ArgumentParser(
 	epilog=None
 )
 
-parser.add_argument("location", type=str,
-					help="The location file to read. Ex: If the location is Illinois, use illinois")
+parser.add_argument(
+	"location",
+	type=str,
+	help="The location file to read. Ex: If the location is Illinois, use illinois"
+)
 
 
 if __name__ == "__main__":
 	args = parser.parse_args()
-	location = f"{args.location}_data.csv"
-	ASSet(location)
+	loc = f"{args.location}_data.csv"
+	ASSet(loc)

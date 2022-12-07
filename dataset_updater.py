@@ -40,7 +40,7 @@ nnect timeout=None)'))
 #######################################################
 # Functions ###########################################
 #######################################################
-def jsonlToJson(raw_data):
+def jsonlToJson(raw_data: str) -> list:
 	"""Responsible for converting .jsonl files into .json files we can work with."""
 	entries = []
 	decoder = json.JSONDecoder()
